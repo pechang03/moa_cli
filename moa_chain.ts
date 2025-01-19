@@ -19,6 +19,7 @@ interface Agent {
     temperature?: number;
     promptTemplate: string;  // Required for all agents
     systemPrompt?: string;
+    apiBase?: string;  // Base URL for the model API
 }
 
 interface AgentConfig extends Agent {
@@ -186,11 +187,17 @@ async function runModel(agent: AgentConfig, prompt: string): Promise<ModelRespon
 
     try {
         let output: string;
-        const instanceUri = agent.instanceUri || getNextInstance().uri;
+        let instanceUri = agent.apiBase || agent.instanceUri || getNextInstance().uri;
+        if (instanceUri.startsWith('${')) {
+            const envVar = instanceUri.slice(2, -1);
+            instanceUri = process.env[envVar] || instanceUri;
+        }
+        // Convert http URL to host:port format if needed
+        instanceUri = instanceUri.replace(/^https?:\/\//, '');
 
         if (agent.model.startsWith("ollama:")) {
             const modelName = agent.model.replace('ollama:', '');
-            const result = await $`OLLAMA_HOST=${instanceUri} ollama run ${modelName} "${prompt}"`;
+            const result = await $`OLLAMA_HOST=${instanceUri} llm prompt -m ${modelName} "${prompt}"`;
             output = result.stdout.toString();
         } else if (agent.model.startsWith("llm:")) {
             const modelName = agent.model.replace('llm:', '');
