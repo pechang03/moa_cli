@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+<system>You are an expert at combining and implementing code improvements. Output only working code with examples.</system>
+<template>
+    <![CDATA[
+    Combine these code reviews into a concrete implementation:
+
+    {responses}
+
+    Respond only with:
+    <final_implementation>
+        <code>
+            /* Complete improved implementation here */
+        </code>
+        <example>
+            /* Usage example */
+        </example>
+        <improvements_summary>
+            /* Brief list of implemented improvements */
+        </improvements_summary>
+    </final_implementation>
+    ]]>
+</template>
+</prompt>
+
